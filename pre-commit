@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# pre-commit.sh
+
+#Check for syntax errors
+git diff --name-only --cached | xargs -l php -l
