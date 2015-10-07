@@ -2,5 +2,17 @@
 
 # pre-commit.sh
 
-#Check for syntax errors
-git diff --name-only --cached | xargs -l php -l
+#Check for syntax errors or debugging outputs
+FILES_PATTERN='\.php$'
+FORBIDDEN='(dd\(.*\)|var_dump|die)'
+
+#Right now it fails when there are no .php staged files, since the output of 'git diff' is empty and 'php -l' is run with no arguments
+#git diff --name-only --cached | \
+#    grep -E $FILES_PATTERN | \
+#    xargs -l php -l && \
+
+# Check for $FORBIDDEN words on the staged files
+git diff --name-only --cached | \
+    grep -E $FILES_PATTERN | \
+    GREP_COLOR='4;5;37;41' xargs grep --color --with-filename -n -E $FORBIDDEN && echo 'COMMIT REJECTED Found DEBUGGING expressions on the code. Please remove them before commiting' && exit 1
+
